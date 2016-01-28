@@ -8,11 +8,11 @@
     <title>SeedSNS</title>
 
     <!-- Bootstrap -->
-    <link href="../../assets/css/bootstrap.css" rel="stylesheet">
-    <link href="../../assets/font-awesome/css/font-awesome.css" rel="stylesheet">
-    <link href="../../assets/css/form.css" rel="stylesheet">
-    <link href="../../assets/css/timeline.css" rel="stylesheet">
-    <link href="../../assets/css/main.css" rel="stylesheet">
+    <link href="../assets/css/bootstrap.css" rel="stylesheet">
+    <link href="../assets/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="../assets/css/form.css" rel="stylesheet">
+    <link href="../assets/css/timeline.css" rel="stylesheet">
+    <link href="../assets/css/main.css" rel="stylesheet">
     <!-- 
       designフォルダ内では2つパスの位置を戻ってからcssにアクセスしていることに注意！
      -->

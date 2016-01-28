@@ -28,10 +28,27 @@
             $error["password"] = 'length';
         }
 
+        $fileName = $_FILES["picture_path"]["name"];
+        if (!empty($fileName)) {
+            // substr関数
+            // 第一引数に入れた文字列から第二引数に入れた文字数から始まる文字を取得
+            $ext = substr($fileName, -3);
+            if ($ext != 'jpg' && $ext != 'gif') {
+                $error["picture_path"] = "type";
+            }
+        }
+
         // エラーがなければ次のページにいくための処理
         if (empty($error)) {
+            // 画像アップロード
+            // member_pictureディレクトリを用意し、サーバ側で権限を777へ
+            // sudo chmod -R 777 ./member_picture/
+            $picture_path = date('YmdHis') . $_FILES["picture_path"]["name"];
+            move_uploaded_file($_FILES["picture_path"]["tmp_name"], '../member_picture/' . $picture_path);
+
             // スーパーグローバル変数$_SESSIONにjoinという場所を作り、そこに$_POSTの内容を入れる
             $_SESSION["join"] = $_POST;
+            $_SESSION["join"]["picture_path"] = $picture_path;
             // check.phpへ遷移
             header('Location: check.php');
             // これ以下のコードを無駄に処理しないように終了する
@@ -95,7 +112,7 @@
     <div class="row">
       <div class="col-md-6 col-md-offset-3 content-margin-top">
         <legend>会員登録</legend>
-        <form method="post" action="" class="form-horizontal" role="form">
+        <form method="post" action="" class="form-horizontal" role="form" enctype="multipart/form-data">
           <!-- ニックネーム -->
           <div class="form-group">
             <label class="col-sm-4 control-label">ニックネーム</label>
@@ -164,6 +181,14 @@
             <label class="col-sm-4 control-label">プロフィール写真</label>
             <div class="col-sm-8">
               <input type="file" name="picture_path" class="form-control">
+              <?php if (isset($error["picture_path"])): ?>
+                  <?php if ($error["picture_path"] == 'type'): ?>
+                      <p class="error">* 画像形式はjpgもしくはgifを指定してください。</p>
+                  <?php endif; ?>
+                  <?php if (!empty($error)): ?>
+                      <p class="error">* 画像を改めて指定してください。</p>
+                  <?php endif; ?>
+              <?php endif; ?>
             </div>
           </div>
 
