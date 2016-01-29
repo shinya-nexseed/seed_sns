@@ -44,8 +44,55 @@
         }
     }
 
-    // 投稿を取得する
-    $sql = 'SELECT m.nick_name, m.picture_path, t.* FROM members m, tweets t ORDER BY t.created DESC';
+    // ページング
+    // URLに?page=2などのページ番号があれば、それを取得して$pageに代入
+    if (isset($_REQUEST['page'])) {
+        $page = $_REQUEST['page'];    
+    }
+    if (empty($page)) {
+        $page = 1;
+    }
+    if ($page == '') {
+        $page = 1;
+    }
+
+    // max関数
+    // ()内に指定した複数データから一番大きい値を取得する
+    $page = max($page,1);
+    // もしユーザーがURLに?page=0.8のような値を入れてリクエストした場合に、強制的に1ページ目にとぶように処理している
+
+    // 最終ページを取得する
+    $sql = 'SELECT COUNT(*) AS cnt FROM tweets';
+    // SELECT COUNTを使ってtweetsテーブルのデータの件数を取得
+
+    $recordSet = mysqli_query($db,$sql) or die(mysqli_error($db));
+    $table = mysqli_fetch_assoc($recordSet);
+
+    // ceil関数
+    // 小数点以下切り上げて数字を作る 例:1.8が指定された場合は切り上げて2を返す
+    $maxPage = ceil($table['cnt'] / 5); // ← 5件がマックスで表示したいデータ件数のため5で割る
+    
+    // もしユーザーがURLに?page=100などのような大きすぎる値を入れてリクエストを送ってきた際に、
+    // DBに保存されているデータの件数を5で割り最大ページ数を算出し、
+    // もしそれ以上の値がセットされていた場合はmin関数を使用して最大ページ数で表示する。
+
+    // min関数
+    // ()内に指定した複数データから一番小さい値を取得する
+    $page = min($page, $maxPage);
+
+    // 1ページなら、$startには0が代入され、DBからSELECT ~ LIMIT 0,5とすることで、
+    // 1個目のデータ(idが1のもの)から5件取得するための$startを用意
+    // もし指定されたページが2ページ目なら、$pageには2が入り、計算処理の結果
+    // $startには5がはいります。
+    // その後SELECT ~ LIMIT 5,5というsql文が発行され、
+    // 6個目のデータから5件取得する処理が作られます。
+    $start = ($page - 1) * 5;
+    $start = max(0, $start);
+
+
+    $sql = sprintf('SELECT m.nick_name, m.picture_path, t.* FROM members m, tweets t ORDER BY t.created DESC LIMIT %d, 5',
+        $start
+    );
     $tweets = mysqli_query($db,$sql) or die(mysqli_error($db));
 
     // 返信の場合
@@ -126,7 +173,21 @@
               </div>
             </div>
 
-          <input type="submit" class="btn btn-info" value="つぶやく">
+          <!-- ページング用のボタン設置 -->
+          <ul class="paging">
+            <input type="submit" class="btn btn-info" value="つぶやく"> -|-
+            <?php if ($page > 1) { ?>
+                <li><a href="index.php?page=<?php print($page - 1); ?>" class="btn btn-default">前</a></li>
+            <?php } else { ?>
+                <li>前</li>
+            <?php } ?>
+             | 
+            <?php if ($page < $maxPage) { ?>
+                <li><a href="index.php?page=<?php print($page + 1); ?>" class="btn btn-default">次</a></li>
+            <?php } else { ?>
+                <li>次</li>
+            <?php } ?>
+          </ul>
         </form>
       </div>
 
