@@ -7,6 +7,11 @@
         return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
     }
 
+    // つぶやき内のURLにリンクを設置
+    function makeLink($value) {
+        return mb_ereg_replace("(https?)(://[[:alnum:]\+\$\;\?\.%,!#~*/:@&=_-]+)",'<a href="\1\2" target="_blank">\1\2</a>', $value);
+    }
+
     if (isset($_SESSION['member_id']) && $_SESSION['time'] + 3600 > time() ) {
         // ログインしている
         $_SESSION['time'] = time();
@@ -131,7 +136,7 @@
             <div class="msg">
               <img src="member_picture/<?php echo h($tweet['picture_path']); ?>" width="48" height="48">
               <p>
-                <?php echo h($tweet['tweet']); ?><span class="name"> (<?php echo h($tweet['nick_name']); ?>) </span>
+                <?php echo makeLink(h($tweet['tweet'])); ?><span class="name"> (<?php echo h($tweet['nick_name']); ?>) </span>
                 [<a href="index.php?res=<?php echo h($tweet['tweet_id']) ?>">Re</a>]
               </p>
               <p class="day">
