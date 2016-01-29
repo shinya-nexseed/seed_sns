@@ -1,3 +1,43 @@
+<?php 
+    session_start();
+    require('dbconnect.php');
+
+    if (isset($_SESSION['member_id']) && $_SESSION['time'] + 3600 > time() ) {
+        // ログインしている
+        $_SESSION['time'] = time();
+
+        $sql = sprintf('SELECT * FROM members WHERE member_id=%d',
+            mysqli_real_escape_string($db, $_SESSION['member_id'])
+        );
+
+        $record = mysqli_query($db, $sql) or die(mysqli_error($db));
+        $member = mysqli_fetch_assoc($record);
+    } else {
+        // ログインしていない
+        header('Location: login.php');
+        exit();
+    }
+
+    // 投稿を記録する
+    if (!empty($_POST)) {
+        if ($_POST['tweet'] != '') {
+            $sql = sprintf('INSERT INTO tweets SET member_id=%d, tweet="%s", created=NOW()',
+                mysqli_real_escape_string($db, $member['member_id']),
+                mysqli_real_escape_string($db, $_POST['tweet'])
+            );
+            mysqli_query($db,$sql) or die(mysqli_error($db));
+
+            // 表示される画面に変化はないが、情報登録の重複を防ぐために必要
+            header('Location: index.php');
+            exit();
+        }
+    }
+
+    // 投稿を取得する
+    $sql = 'SELECT m.nick_name, m.picture_path, t.* FROM members m, tweets t ORDER BY t.created DESC';
+    $tweets = mysqli_query($db,$sql) or die(mysqli_error($db));
+ ?>
+
 <!DOCTYPE html>
 <html lang="ja">
   <head>
@@ -48,73 +88,37 @@
   <div class="container">
     <div class="row">
       <div class="col-md-4 content-margin-top">
-        <legend>ようこそ●●さん！</legend>
+        <legend>ようこそ<?php echo htmlspecialchars($member['nick_name']); ?>さん！</legend>
         <form method="post" action="" class="form-horizontal" role="form">
             <!-- つぶやき -->
             <div class="form-group">
               <label class="col-sm-4 control-label">つぶやき</label>
               <div class="col-sm-8">
-                <input type="text" name="age" class="form-control" placeholder="例：Hello World!">
+                <!-- tweet用にフォームを修正 -->
+                <textarea name="tweet" cols="50" rows="5" class="form-control" placeholder="例：Hello World!"></textarea>
               </div>
             </div>
 
-          <input type="submit" class="btn btn-default" value="つぶやく">
+          <input type="submit" class="btn btn-info" value="つぶやく">
         </form>
       </div>
 
       <div class="col-md-8 content-margin-top">
-        <div class="msg">
-          <img src="http://c85c7a.medialib.glogster.com/taniaarca/media/71/71c8671f98761a43f6f50a282e20f0b82bdb1f8c/blog-images-1349202732-fondo-steve-jobs-ipad.jpg" width="48" height="48">
-          <p>
-            つぶやき４<span class="name"> (Seed kun) </span>
-            [<a href="#">Re</a>]
-          </p>
-          <p class="day">
-            <a href="#">
-              2016-01-28 18:04
-            </a>
-            [<a href="#" style="color: #F33;">削除</a>]
-          </p>
-        </div>
-        <div class="msg">
-          <img src="http://c85c7a.medialib.glogster.com/taniaarca/media/71/71c8671f98761a43f6f50a282e20f0b82bdb1f8c/blog-images-1349202732-fondo-steve-jobs-ipad.jpg" width="48" height="48">
-          <p>
-            つぶやき３<span class="name"> (Seed kun) </span>
-            [<a href="#">Re</a>]
-          </p>
-          <p class="day">
-            <a href="#">
-              2016-01-28 18:03
-            </a>
-            [<a href="#" style="color: #F33;">削除</a>]
-          </p>
-        </div>
-        <div class="msg">
-          <img src="http://c85c7a.medialib.glogster.com/taniaarca/media/71/71c8671f98761a43f6f50a282e20f0b82bdb1f8c/blog-images-1349202732-fondo-steve-jobs-ipad.jpg" width="48" height="48">
-          <p>
-            つぶやき２<span class="name"> (Seed kun) </span>
-            [<a href="#">Re</a>]
-          </p>
-          <p class="day">
-            <a href="#">
-              2016-01-28 18:02
-            </a>
-            [<a href="#" style="color: #F33;">削除</a>]
-          </p>
-        </div>
-        <div class="msg">
-          <img src="http://c85c7a.medialib.glogster.com/taniaarca/media/71/71c8671f98761a43f6f50a282e20f0b82bdb1f8c/blog-images-1349202732-fondo-steve-jobs-ipad.jpg" width="48" height="48">
-          <p>
-            つぶやき１<span class="name"> (Seed kun) </span>
-            [<a href="#">Re</a>]
-          </p>
-          <p class="day">
-            <a href="#">
-              2016-01-28 18:01
-            </a>
-            [<a href="#" style="color: #F33;">削除</a>]
-          </p>
-        </div>
+        
+        <?php while ($tweet = mysqli_fetch_assoc($tweets)): ?>
+            <div class="msg">
+              <img src="member_picture/<?php echo htmlspecialchars($tweet['picture_path']); ?>" width="48" height="48">
+              <p>
+                <?php echo htmlspecialchars($tweet['tweet']); ?><span class="name"> (<?php echo htmlspecialchars($tweet['nick_name']); ?>) </span>
+              </p>
+              <p class="day">
+                <a href="#">
+                  <?php echo htmlspecialchars($tweet['created']); ?>
+                </a>
+                [<a href="#" style="color: #F33;">削除</a>]
+              </p>
+            </div>
+        <?php endwhile; ?>
       
       </div>
     </div>

@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.5.2
+-- version 4.4.15
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: 2016 年 1 月 29 日 09:08
--- サーバのバージョン： 5.5.42
--- PHP Version: 5.6.10
+-- Generation Time: 2016 年 1 月 29 日 11:12
+-- サーバのバージョン： 5.6.27
+-- PHP Version: 5.5.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -46,7 +46,7 @@ CREATE TABLE `tweets` (
   `tweet_id` int(11) NOT NULL,
   `tweet` text CHARACTER SET utf8 NOT NULL,
   `member_id` int(11) NOT NULL,
-  `reply_tweet_id` int(11) NOT NULL,
+  `reply_tweet_id` int(11) DEFAULT NULL,
   `created` datetime NOT NULL,
   `modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
