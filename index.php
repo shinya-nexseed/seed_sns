@@ -146,7 +146,9 @@
                 <?php if ($tweet['reply_tweet_id']): ?>
                     <a href="view.php?id=<?php echo h($tweet['reply_tweet_id']); ?>">返信元のつぶやきへ</a>
                 <?php endif; ?>
-                [<a href="#" style="color: #F33;">削除</a>]
+                <?php if ($_SESSION['member_id'] == $tweet['member_id']): ?>
+                    [<a href="delete.php?id=<?php echo h($tweet['tweet_id']) ?>" style="color: #F33;">削除</a>]
+                <?php endif; ?>
               </p>
             </div>
         <?php endwhile; ?>
