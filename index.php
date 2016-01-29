@@ -130,9 +130,12 @@
                 [<a href="index.php?res=<?php echo htmlspecialchars($tweet['tweet_id']) ?>">Re</a>]
               </p>
               <p class="day">
-                <a href="#">
+                <a href="view.php?id=<?php echo htmlspecialchars($tweet['tweet_id']); ?>">
                   <?php echo htmlspecialchars($tweet['created']); ?>
                 </a>
+                <?php if ($tweet['reply_tweet_id']): ?>
+                    <a href="view.php?id=<?php echo htmlspecialchars($tweet['reply_tweet_id']); ?>">返信元のつぶやきへ</a>
+                <?php endif; ?>
                 [<a href="#" style="color: #F33;">削除</a>]
               </p>
             </div>
