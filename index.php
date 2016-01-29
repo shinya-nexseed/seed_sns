@@ -209,6 +209,7 @@
                     <a href="view.php?id=<?php echo h($tweet['reply_tweet_id']); ?>">返信元のつぶやきへ</a>
                 <?php endif; ?>
                 <?php if ($_SESSION['member_id'] == $tweet['member_id']): ?>
+                    [<a href="edit.php?id=<?php echo h($tweet['tweet_id']) ?>" style="color: #00994C;">編集</a>]
                     [<a href="delete.php?id=<?php echo h($tweet['tweet_id']) ?>" style="color: #F33;">削除</a>]
                 <?php endif; ?>
               </p>
