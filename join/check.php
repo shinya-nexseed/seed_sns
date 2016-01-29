@@ -1,9 +1,30 @@
 <?php 
     session_start();
+    require('../dbconnect.php');
 
     // もしindex.phpを経由せず直接check.phpにアクセスがあった場合の処理
     if (!isset($_SESSION["join"])) {
         header("Location: index.php");
+        exit();
+    }
+
+    if (!empty($_POST)) {
+        // 登録処理をする
+        $sql = sprintf('INSERT INTO members SET nick_name="%s",
+            email="%s", password="%s", picture_path="%s", created=NOW()',
+            mysqli_real_escape_string($db,$_SESSION['join']['nick_name']),
+            mysqli_real_escape_string($db,$_SESSION['join']['email']),
+            mysqli_real_escape_string($db,sha1($_SESSION['join']['password'])),
+            mysqli_real_escape_string($db,$_SESSION['join']['picture_path'])
+        );
+
+        // sha1()関数
+        // この関数は指定した文字列を暗号化して返します。
+
+        mysqli_query($db,$sql) or die(mysqli_error($db));
+        unset($_SESSION['join']);
+
+        header('Location: thanks.php');
         exit();
     }
  ?>
@@ -99,7 +120,7 @@
             </table>
 
             <a href="index.php?action=rewrite">&laquo;&nbsp;書き直す</a> | 
-            <input type="button" class="btn btn-default" value="会員登録">
+            <input type="submit" class="btn btn-default" value="会員登録">
           </div>
         </form>
       </div>
