@@ -2,6 +2,11 @@
     session_start();
     require('dbconnect.php');
 
+    // htmlspecialcharsのショートカット
+    function h($value) {
+        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    }
+
     if (empty($_REQUEST['id'])) {
         header('Location: index.php');
         exit();
@@ -66,14 +71,14 @@
       <div class="col-md-4 col-md-offset-4 content-margin-top">
         <?php if ($tweet = mysqli_fetch_assoc($tweets)): ?>
             <div class="msg">
-              <img src="member_picture/<?php echo htmlspecialchars($tweet['picture_path']); ?>" width="100" height="100">
-              <p>投稿者 : <span class="name"> <?php echo htmlspecialchars($tweet['nick_name']); ?> </span></p>
+              <img src="member_picture/<?php echo h($tweet['picture_path']); ?>" width="100" height="100">
+              <p>投稿者 : <span class="name"> <?php echo h($tweet['nick_name']); ?> </span></p>
               <p>
                 つぶやき : <br>
-                <?php echo htmlspecialchars($tweet['tweet']); ?>
+                <?php echo h($tweet['tweet']); ?>
               </p>
               <p class="day">
-                <?php echo htmlspecialchars($tweet['created']); ?>
+                <?php echo h($tweet['created']); ?>
                 [<a href="#" style="color: #F33;">削除</a>]
               </p>
             </div>

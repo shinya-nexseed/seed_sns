@@ -2,6 +2,11 @@
     session_start();
     require('../dbconnect.php');
 
+    // htmlspecialcharsのショートカット
+    function h($value) {
+        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    }
+
     // post送信があれば処理をする
     if (!empty($_POST)) {
         // empty関数
@@ -141,7 +146,7 @@
               <?php
                   if (isset($_POST["nick_name"])) {
                       echo sprintf('<input type="text" name="nick_name" class="form-control" placeholder="例： Seed kun" value="%s">',
-                          htmlspecialchars($_POST["nick_name"])
+                          h($_POST["nick_name"])
                       );
                   } else {
                       echo '<input type="text" name="nick_name" class="form-control" placeholder="例： Seed kun">';
@@ -161,7 +166,7 @@
               <?php
                   if (isset($_POST["email"])) {
                       echo sprintf('<input type="email" name="email" class="form-control" placeholder="例： seed@nex.com"  value="%s">',
-                          htmlspecialchars($_POST["email"])
+                          h($_POST["email"])
                       );
                   } else {
                       echo '<input type="email" name="email" class="form-control" placeholder="例： seed@nex.com">';
@@ -184,7 +189,7 @@
               <?php
                   if (isset($_POST["password"])) {
                       echo sprintf('<input type="password" name="password" class="form-control" placeholder="" value="%s">',
-                          htmlspecialchars($_POST["password"])
+                          h($_POST["password"])
                       );
                   } else {
                       echo '<input type="password" name="password" class="form-control" placeholder="">';

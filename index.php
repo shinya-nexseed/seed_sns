@@ -2,6 +2,11 @@
     session_start();
     require('dbconnect.php');
 
+    // htmlspecialcharsのショートカット
+    function h($value) {
+        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    }
+
     if (isset($_SESSION['member_id']) && $_SESSION['time'] + 3600 > time() ) {
         // ログインしている
         $_SESSION['time'] = time();
@@ -99,7 +104,7 @@
   <div class="container">
     <div class="row">
       <div class="col-md-4 content-margin-top">
-        <legend>ようこそ<?php echo htmlspecialchars($member['nick_name']); ?>さん！</legend>
+        <legend>ようこそ<?php echo h($member['nick_name']); ?>さん！</legend>
         <form method="post" action="" class="form-horizontal" role="form">
             <!-- つぶやき -->
             <div class="form-group">
@@ -108,8 +113,8 @@
                 <!-- tweet用にフォームを修正 -->
 
                 <?php if (isset($_REQUEST['res'])): ?>
-                    <textarea name="tweet" cols="50" rows="5" class="form-control" placeholder="例：Hello World!"><?php echo htmlspecialchars($tweet); ?></textarea>
-                    <input type="hidden" name="reply_tweet_id" value="<?php echo htmlspecialchars($_REQUEST['res']); ?>">
+                    <textarea name="tweet" cols="50" rows="5" class="form-control" placeholder="例：Hello World!"><?php echo h($tweet); ?></textarea>
+                    <input type="hidden" name="reply_tweet_id" value="<?php echo h($_REQUEST['res']); ?>">
                 <?php else: ?>
                     <textarea name="tweet" cols="50" rows="5" class="form-control" placeholder="例：Hello World!"></textarea>
                 <?php endif; ?>
@@ -124,17 +129,17 @@
         
         <?php while ($tweet = mysqli_fetch_assoc($tweets)): ?>
             <div class="msg">
-              <img src="member_picture/<?php echo htmlspecialchars($tweet['picture_path']); ?>" width="48" height="48">
+              <img src="member_picture/<?php echo h($tweet['picture_path']); ?>" width="48" height="48">
               <p>
-                <?php echo htmlspecialchars($tweet['tweet']); ?><span class="name"> (<?php echo htmlspecialchars($tweet['nick_name']); ?>) </span>
-                [<a href="index.php?res=<?php echo htmlspecialchars($tweet['tweet_id']) ?>">Re</a>]
+                <?php echo h($tweet['tweet']); ?><span class="name"> (<?php echo h($tweet['nick_name']); ?>) </span>
+                [<a href="index.php?res=<?php echo h($tweet['tweet_id']) ?>">Re</a>]
               </p>
               <p class="day">
-                <a href="view.php?id=<?php echo htmlspecialchars($tweet['tweet_id']); ?>">
-                  <?php echo htmlspecialchars($tweet['created']); ?>
+                <a href="view.php?id=<?php echo h($tweet['tweet_id']); ?>">
+                  <?php echo h($tweet['created']); ?>
                 </a>
                 <?php if ($tweet['reply_tweet_id']): ?>
-                    <a href="view.php?id=<?php echo htmlspecialchars($tweet['reply_tweet_id']); ?>">返信元のつぶやきへ</a>
+                    <a href="view.php?id=<?php echo h($tweet['reply_tweet_id']); ?>">返信元のつぶやきへ</a>
                 <?php endif; ?>
                 [<a href="#" style="color: #F33;">削除</a>]
               </p>

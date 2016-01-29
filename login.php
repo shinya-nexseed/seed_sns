@@ -1,7 +1,11 @@
 <?php 
+    session_start();
     require('dbconnect.php');
 
-    session_start();
+    // htmlspecialcharsのショートカット
+    function h($value) {
+        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    }
 
     if (isset($_COOKIE['email'])) {
         if ($_COOKIE['email'] != '') {
@@ -112,7 +116,7 @@
             <div class="col-sm-8">
               <?php if (isset($_POST['email'])): ?>
                   <!-- join/index.phpに時とは別の書き方 (sprintf()を使わない) -->
-                  <input type="email" name="email" class="form-control" placeholder="例： seed@nex.com" value="<?php echo htmlspecialchars($_POST['email']); ?>">
+                  <input type="email" name="email" class="form-control" placeholder="例： seed@nex.com" value="<?php echo h($_POST['email']); ?>">
               <?php else: ?>
                   <input type="email" name="email" class="form-control" placeholder="例： seed@nex.com">
               <?php endif; ?>
@@ -131,7 +135,7 @@
             <label class="col-sm-4 control-label">パスワード</label>
             <div class="col-sm-8">
               <?php if (isset($_POST['password'])): ?>
-                  <input type="password" name="password" class="form-control" placeholder="" value="<?php echo htmlspecialchars($_POST['password']); ?>">
+                  <input type="password" name="password" class="form-control" placeholder="" value="<?php echo h($_POST['password']); ?>">
               <?php else: ?>
                   <input type="password" name="password" class="form-control" placeholder="">
               <?php endif; ?>
