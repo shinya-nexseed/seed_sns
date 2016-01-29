@@ -21,9 +21,10 @@
     // 投稿を記録する
     if (!empty($_POST)) {
         if ($_POST['tweet'] != '') {
-            $sql = sprintf('INSERT INTO tweets SET member_id=%d, tweet="%s", created=NOW()',
+            $sql = sprintf('INSERT INTO tweets SET member_id=%d, tweet="%s", reply_tweet_id=%d, created=NOW()',
                 mysqli_real_escape_string($db, $member['member_id']),
-                mysqli_real_escape_string($db, $_POST['tweet'])
+                mysqli_real_escape_string($db, $_POST['tweet']), // ,を忘れずに
+                mysqli_real_escape_string($db, $_POST['reply_tweet_id']) // ここ足すとnullじゃなくて0が入るようになる
             );
             mysqli_query($db,$sql) or die(mysqli_error($db));
 
@@ -36,6 +37,16 @@
     // 投稿を取得する
     $sql = 'SELECT m.nick_name, m.picture_path, t.* FROM members m, tweets t ORDER BY t.created DESC';
     $tweets = mysqli_query($db,$sql) or die(mysqli_error($db));
+
+    // 返信の場合
+    if (isset($_REQUEST['res'])) {
+        $sql = sprintf('SELECT m.nick_name, m.picture_path, t.* FROM members m, tweets t WHERE t.tweet_id=%d ORDER BY t.created DESC',
+            mysqli_real_escape_string($db, $_REQUEST['res'])
+        );
+        $record = mysqli_query($db, $sql) or die(mysqli_error($db));
+        $table = mysqli_fetch_assoc($record);
+        $tweet = ' >> @' . $table['nick_name'] . ' ' . $table['tweet'];
+    }
  ?>
 
 <!DOCTYPE html>
@@ -95,7 +106,13 @@
               <label class="col-sm-4 control-label">つぶやき</label>
               <div class="col-sm-8">
                 <!-- tweet用にフォームを修正 -->
-                <textarea name="tweet" cols="50" rows="5" class="form-control" placeholder="例：Hello World!"></textarea>
+
+                <?php if (isset($_REQUEST['res'])): ?>
+                    <textarea name="tweet" cols="50" rows="5" class="form-control" placeholder="例：Hello World!"><?php echo htmlspecialchars($tweet); ?></textarea>
+                    <input type="hidden" name="reply_tweet_id" value="<?php echo htmlspecialchars($_REQUEST['res']); ?>">
+                <?php else: ?>
+                    <textarea name="tweet" cols="50" rows="5" class="form-control" placeholder="例：Hello World!"></textarea>
+                <?php endif; ?>
               </div>
             </div>
 
@@ -110,6 +127,7 @@
               <img src="member_picture/<?php echo htmlspecialchars($tweet['picture_path']); ?>" width="48" height="48">
               <p>
                 <?php echo htmlspecialchars($tweet['tweet']); ?><span class="name"> (<?php echo htmlspecialchars($tweet['nick_name']); ?>) </span>
+                [<a href="index.php?res=<?php echo htmlspecialchars($tweet['tweet_id']) ?>">Re</a>]
               </p>
               <p class="day">
                 <a href="#">
